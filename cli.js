@@ -14,20 +14,20 @@ commander
     .option('-i, --ignore <ignoredVars>', 'ignore variables, comma separated')
     .parse(process.argv);
 
-function main(args) {
+async function main(args) {
     const ignore = commander.ignore ? commander.ignore.split(',') : [];
 
     console.log('Looking for unused variables');
 
     let unusedList = [];
 
-    args.forEach(arg => {
+    await Promise.all(args.map(async arg => {
         const dir = path.resolve(arg);
 
         console.log(`Finding unused variables in "${chalk.cyan.bold(dir)}"...`);
 
         // eslint-disable-next-line unicorn/no-array-callback-reference
-        const unusedVars = fusv.find(dir, { ignore });
+        const unusedVars = await fusv.find(dir, { ignore });
 
         console.log(`${chalk.cyan.bold(unusedVars.total)} total variables.`);
 
@@ -36,7 +36,8 @@ function main(args) {
         });
 
         unusedList = unusedList.concat(unusedVars.unused);
-    });
+        return unusedList;
+    }));
 
     if (unusedList.length === 0) {
         console.log('No unused variables found!');
@@ -46,10 +47,17 @@ function main(args) {
     process.exit(1);
 }
 
-const args = commander.args.filter(arg => typeof arg === 'string');
+(async() => {
+    try {
+        const args = commander.args.filter(arg => typeof arg === 'string');
 
-if (args.length > 0) {
-    main(args);
-} else {
-    commander.help();
-}
+        if (args.length > 0) {
+            await main(args);
+        } else {
+            commander.help();
+        }
+    } catch (error) {
+        console.error(error);
+        process.exit(1);
+    }
+})();

@@ -31,7 +31,7 @@
     "chalk": "^4.1.0",
     "commander": "^5.1.0",
     "escape-string-regexp": "^4.0.0",
-    "glob": "^7.1.6",
+    "globby": "^11.0.2",
     "postcss": "^8.2.4",
     "postcss-scss": "^3.0.4"
   },
@@ -44,7 +44,7 @@
     "lib/parse-variable.js"
   ],
   "engines": {
-    "node": ">=10"
+    "node": ">=10.17.0"
   },
   "keywords": [
     "sass",
@@ -64,6 +64,7 @@
         "error",
         "never"
       ],
+      "spaced-comment": "off",
       "unicorn/no-array-reduce": "off",
       "unicorn/prevent-abbreviations": "off"
     }

@@ -1,8 +1,8 @@
 'use strict';
 
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
-const glob = require('glob');
+const globby = require('globby');
 const escapeRegex = require('escape-string-regexp');
 const parse = require('./lib/parse-variable');
 
@@ -10,7 +10,7 @@ const defaultOptions = {
     ignore: []
 };
 
-function findUnusedVars(strDir, opts) {
+async function findUnusedVars(strDir, opts) {
     const options = Object.assign(defaultOptions, opts);
     const dir = path.isAbsolute(strDir) ? strDir : path.resolve(strDir);
 
@@ -19,20 +19,23 @@ function findUnusedVars(strDir, opts) {
     }
 
     // Trim list of ignored variables
-    options.ignore = options.ignore.map(val => val.trim());
+    options.ignore = options.ignore.map(value => value.trim());
 
-    if (!(fs.existsSync(dir) && fs.statSync(dir).isDirectory())) {
-        throw new Error(`"${dir}": Not a valid directory!`);
-    }
+    //if (!(fs.existsSync(dir) && fs.statSync(dir).isDirectory())) {
+    //    throw new Error(`"${dir}": Not a valid directory!`);
+    //}
 
     // Array of all Sass files
-    const sassFiles = glob.sync(path.join(dir, '**/*.scss'));
+    const sassFiles = await globby('**/*.scss', { cwd: dir, absolute: true, onlyFiles: true });
+    //console.log(`sassFiles: ${sassFiles}`);
 
     // String of all Sass files' content
-    let sassFilesString = sassFiles.reduce((sassStr, file) => {
-        sassStr += fs.readFileSync(file, 'utf8');
+    let sassFilesString = await sassFiles.reduce(async(sassStr, file) => {
+        sassStr += await fs.readFile(file, 'utf8');
         return sassStr;
     }, '');
+
+    //console.log(`sassFilesString: ${sassFilesString}`);
 
     // Remove jekyll comments
     if (sassFilesString.includes('---')) {
