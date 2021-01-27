@@ -28,29 +28,51 @@ function findUnusedVars(strDir, opts) {
     // Array of all Sass files
     const sassFiles = glob.sync(path.join(dir, '**/*.scss'));
 
-    // String of all Sass files' content
-    let sassFilesString = sassFiles.reduce((sassStr, file) => {
-        sassStr += fs.readFileSync(file, 'utf8');
-        return sassStr;
-    }, '');
+    // Get per file:
+    //      path relatively to given sass file directory
+    //      linesCumulated: sum of all files before and including
+    //      the currently examined file
+    const currentDirectory = process.cwd();
+    let variables = [];
+    const sassVarInfo = [];
+    let strSass = '';
+    let sassFilesString = '';
+    sassFiles.forEach((file, i) => {
+        strSass = fs.readFileSync(file, 'utf8');
 
-    // Remove jekyll comments
-    if (sassFilesString.includes('---')) {
-        sassFilesString = sassFilesString.replace(/---/g, '');
-    }
+        // remove jekyl comments
+        if (strSass.includes('---')) {
+            strSass = strSass.replace(/---/g, '');
+        }
 
-    const variables = parse(sassFilesString, options.ignore);
+        const fileRelativePath = path.relative(currentDirectory, file);
+        sassVarInfo[i] = parse(strSass, options.ignore, fileRelativePath);
 
-    // Store unused vars from all files and loop through each variable
-    const unusedVars = variables.filter(variable => {
-        const re = new RegExp(`(${escapeRegex(variable)})\\b(?!-)`, 'g');
+        variables = [].concat(...sassVarInfo);
+        sassFilesString += strSass;
+    });
 
-        return sassFilesString.match(re).length === 1;
+    // Filter the unused variables from 'variables' by checking
+    // the number of occurences in sassFilesString
+    const unusedVars = [];
+    const unusedVarsOrigin = variables.filter(variable => {
+        const re = new RegExp(`(${escapeRegex(variable.name)})\\b(?!-)`, 'g');
+
+        if (sassFilesString.match(re).length === 1) {
+            unusedVars.push(variable.name);
+
+            return true;
+        }
+
+        return false;
     });
 
     return {
-        unused: unusedVars,
-        total: variables.length
+        totalUnusedVars: unusedVarsOrigin.length,
+        total: variables.length,
+        unusedOrigin: unusedVarsOrigin,
+        // for backwards compatibility of API
+        unused: unusedVars
     };
 }
 
