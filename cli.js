@@ -7,11 +7,15 @@ const commander = require('commander');
 const chalk = require('chalk');
 const { version } = require('./package.json');
 const fusv = require('.');
+const report = require('./lib/report');
 
 commander
     .usage('[options] <folders...>')
     .version(version, '-v, --version')
     .option('-i, --ignore <ignoredVars>', 'ignore variables, comma separated')
+    .option('-o, --output-file <file path>', 'path of file to write a report')
+    .option('-f, --formatter <format>', 'the output formatter: string, json, sonar (sonar generic issue format for SonarScanner)', 'string')
+    .option('-s, --exit-success', 'exit succesfully, even if unused sass variables are found\n(useful for sonar reports if fusv is used before a linter)')
     .parse(process.argv);
 
 function main(args) {
@@ -29,18 +33,23 @@ function main(args) {
         // eslint-disable-next-line unicorn/no-array-callback-reference
         const unusedVars = fusv.find(dir, { ignore });
 
-        console.log(`${chalk.cyan.bold(unusedVars.total)} total variables.`);
+        unusedVars.unusedInfo.printSummary();
+        unusedVars.unusedInfo.printReportToConsole();
 
-        unusedVars.unused.forEach(unusedVar => {
-            console.log(`Variable ${chalk.bold(unusedVar)} is not being used!`);
-        });
-
-        // eslint-disable-next-line unicorn/prefer-spread
-        unusedList = unusedList.concat(unusedVars.unused);
+        unusedList = unusedList.concat(unusedVars.unusedInfo);
     });
+
+    if (commander.outputFile) {
+        report.printReportToFile(unusedList, commander.outputFile,
+            commander.formatter);
+    }
 
     if (unusedList.length === 0) {
         console.log('No unused variables found!');
+        process.exit(0);
+    }
+
+    if (commander.exitSuccess) {
         process.exit(0);
     }
 

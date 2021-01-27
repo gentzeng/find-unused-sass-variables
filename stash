@@ -1,0 +1,56 @@
+[1mdiff --git a/index.js b/index.js[m
+[1mindex 9afa338..b6314e4 100644[m
+[1m--- a/index.js[m
+[1m+++ b/index.js[m
+[36m@@ -30,6 +30,8 @@[m [mfunction concatSassFiles(sassFiles) {[m
+         return sassStrCat;[m
+     }, '');[m
+ [m
+[32m+[m[32m    console.log("jooo")[m
+[32m+[m[32m    console.log(sassFilesString)[m
+     return sassFilesString;[m
+ }[m
+ [m
+[36m@@ -55,6 +57,7 @@[m [mfunction getFilesInfo(sassFiles) {[m
+         });[m
+     }, '');[m
+ [m
+[32m+[m[32m    console.log(singleFilesInfo)[m
+     return singleFilesInfo;[m
+ }[m
+ [m
+[36m@@ -95,6 +98,8 @@[m [mfunction calcLineOfVar(varInfo, singleFilesInfo) {[m
+         calcLineOfVar.linesCumulated = currentFileInfo.linesCumulated;[m
+     }[m
+ [m
+[32m+[m[32m    console.log(varInfo);[m
+[32m+[m
+     // Since finding unused variables work on a "catFile",[m
+     // i.e., a concatenation of all files, we have to calculate lines per file[m
+     // from variable lines in the catFile[m
+[36m@@ -103,18 +108,24 @@[m [mfunction calcLineOfVar(varInfo, singleFilesInfo) {[m
+     // if the variables line in catFile exceeds the sum of line from previous[m
+     // file, use the tracking info of the next file[m
+ [m
+[31m-    if (varLineInAllFiles > calcLineOfVar.linesCumulated) {[m
+[32m+[m[32m    while (varLineInAllFiles > calcLineOfVar.linesCumulated) {[m
+         const currentFileInfo = singleFilesInfo[++calcLineOfVar.counter];[m
+[32m+[m[32m        console.log(`${varLineInAllFiles}\t${calcLineOfVar.linesChecked}\t${calcLineOfVar.linesCumulated}`);[m
+         calcLineOfVar.linesChecked = calcLineOfVar.linesCumulated;[m
+         calcLineOfVar.linesCumulated = currentFileInfo.linesCumulated;[m
+[32m+[m[32m        console.log(`${varLineInAllFiles}\t${calcLineOfVar.linesChecked}\t${calcLineOfVar.linesCumulated}`);[m
+[32m+[m[32m        console.log(calcLineOfVar.linesChecked);[m
+     }[m
+ [m
+     // line in own file of a variable is equal to its line in the catFile minus[m
+     // the checked lines, i.e., the sum of all lines from previous files[m
+[32m+[m[32m    console.log(calcLineOfVar.linesChecked);[m
+     varInfo.lineInOwnFile = varLineInAllFiles - calcLineOfVar.linesChecked;[m
+     varInfo.file = singleFilesInfo[calcLineOfVar.counter].file;[m
+     delete varInfo.lineInAllFiles;[m
+ [m
+[32m+[m[32m    console.log(varInfo);[m
+[32m+[m
+     return varInfo;[m
+ }[m
+ [m

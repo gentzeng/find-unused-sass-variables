@@ -41,7 +41,8 @@
   "files": [
     "cli.js",
     "index.js",
-    "lib/parse-variable.js"
+    "lib/parse-variable.js",
+    "lib/report.js"
   ],
   "engines": {
     "node": ">=10"

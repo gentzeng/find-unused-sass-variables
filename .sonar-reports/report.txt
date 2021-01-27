@@ -1,0 +1,12 @@
+
+tests/_variables.scss
+ 2:1	Variable $a is not being used!
+ 3:1	Variable $b is not being used!
+ 4:1	Variable $unused is not being used!
+ 5:1	Variable $black is not being used!
+ 13:1	Variable $ignored-variable is not being used!
+ 19:1	Variable $enabled-variable is not being used!
+
+tests/test.scss
+ 7:5	Variable $nestedVar is not being used!
+ 12:9	Variable $nestNestedVar is not being used!
