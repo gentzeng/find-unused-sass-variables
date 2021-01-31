@@ -30,10 +30,10 @@ function main(args) {
         const unusedVars = fusv.find(dir, { ignore });
 
         console.log(`${chalk.cyan.bold(unusedVars.total)} total variables.`);
-        console.log(`${chalk.cyan.bold(unusedVars.totalUnusedVars)} total unused variables.`);
+        console.log(`${chalk.cyan.bold(unusedVars.unused.length)} total unused variables.`);
 
         let currentFile = '';
-        unusedVars.unusedOrigin.forEach(unusedVar => {
+        unusedVars.unusedInfo.forEach(unusedVar => {
             if (currentFile !== unusedVar.file) {
                 currentFile = unusedVar.file;
                 console.log(`\n${chalk.underline(currentFile)}`);
@@ -45,7 +45,7 @@ function main(args) {
             );
         });
 
-        unusedList = unusedList.concat(unusedVars.unusedOrigin);
+        unusedList = unusedList.concat(unusedVars.unused);
     });
 
     if (unusedList.length === 0) {

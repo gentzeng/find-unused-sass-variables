@@ -52,27 +52,17 @@ function findUnusedVars(strDir, opts) {
         sassFilesString += strSass;
     });
 
-    // Filter the unused variables from 'variables' by checking
-    // the number of occurences in sassFilesString
-    const unusedVars = [];
-    const unusedVarsOrigin = variables.filter(variable => {
+    // Store unused vars from all files and loop through each variable
+    const unusedVars = variables.filter(variable => {
         const re = new RegExp(`(${escapeRegex(variable.name)})\\b(?!-)`, 'g');
 
-        if (sassFilesString.match(re).length === 1) {
-            unusedVars.push(variable.name);
-
-            return true;
-        }
-
-        return false;
+        return sassFilesString.match(re).length === 1;
     });
 
     return {
-        totalUnusedVars: unusedVarsOrigin.length,
-        total: variables.length,
-        unusedOrigin: unusedVarsOrigin,
-        // for backwards compatibility of API
-        unused: unusedVars
+        unused: unusedVars.map(({ name }) => name),
+        unusedInfo: unusedVars,
+        total: variables.length
     };
 }
 

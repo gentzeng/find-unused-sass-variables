@@ -31,7 +31,7 @@ let unused = fusv.find('scss')
 // Array of unused variables
 console.log(unused.unused);
 // ['$foo', '$bar', '$imunused']
-console.log(unused.unusedOrigin);
+console.log(unused.unusedInfo);
 // [
 //  {
 //      name: '$foo',
@@ -45,10 +45,10 @@ console.log(unused.unusedOrigin);
 //      line: y_2
 //      file 'scss/bar.scss'
 //  }
-]
+// ]
 console.log(unused.total);
 // Total number of variables in the files in directory 'scss'
-console.log(unused.totalUnused);
+console.log(unused.unused.length);
 // Number of unused variables in the files in directory 'scss'
 
 // ignoring variables
@@ -61,12 +61,12 @@ unused = fusv.find('scss', { ignore: ignoredVars })
 * `dir`: string
 * `options`: optional options Object
 
-Returns an object with `unusedOrigin`, `unused`, `totalUnused` and`total`.
+Returns an object with `unusedInfo`, `unused`, `unused.length` and`total`.
 
-* `unusedOrigin` is an array carrying objects containing unused sass variables and their origin,
+* `unusedInfo` is an array carrying objects containing unused sass variables and their origin,
 Information included are the `name` of the variable as well as the `line` and `column` of the variable in their originating `file`,
 * `unused` is an of array of unused variables without further information,
-* `totalUnused` has the sum of all unused variables of all examined files in given `dir`,
+* `unused.length` has the sum of all unused variables of all examined files in given `dir`,
 *  and `total` has the sum of all variables of all examined files in given `dir` (unused and used ones).
 
 #### options.ignore
